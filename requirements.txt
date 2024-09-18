@@ -1,0 +1,5 @@
+mongoengine~=0.29.0
+selenium~=4.24.0
+scrapy~=2.11.2
+openai~=1.45.0
+itemadapter~=0.9.0

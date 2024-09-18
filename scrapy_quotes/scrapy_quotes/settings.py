@@ -1,4 +1,4 @@
-# Scrapy settings for scrapy_thepaper project
+# Scrapy settings for scrapy_quotes project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -7,14 +7,14 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = "scrapy_thepaper"
+BOT_NAME = "scrapy_quotes"
 
-SPIDER_MODULES = ["scrapy_thepaper.spiders"]
-NEWSPIDER_MODULE = "scrapy_thepaper.spiders"
+SPIDER_MODULES = ["scrapy_quotes.spiders"]
+NEWSPIDER_MODULE = "scrapy_quotes.spiders"
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = "scrapy_thepaper (+http://www.yourdomain.com)"
+#USER_AGENT = "scrapy_quotes (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -45,13 +45,13 @@ ROBOTSTXT_OBEY = True
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    "scrapy_thepaper.middlewares.ScrapyThepaperSpiderMiddleware": 543,
+#    "scrapy_quotes.middlewares.ScrapyQuotesSpiderMiddleware": 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    "scrapy_thepaper.middlewares.ScrapyThepaperDownloaderMiddleware": 543,
+#    "scrapy_quotes.middlewares.ScrapyQuotesDownloaderMiddleware": 543,
 #}
 
 # Enable or disable extensions
@@ -63,7 +63,7 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 #ITEM_PIPELINES = {
-#    "scrapy_thepaper.pipelines.ScrapyThepaperPipeline": 300,
+#    "scrapy_quotes.pipelines.ScrapyQuotesPipeline": 300,
 #}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
