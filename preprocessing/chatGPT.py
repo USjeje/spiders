@@ -9,11 +9,12 @@ class Client:
     def __init__(self, model='gpt-4o'):
         self.client = openai.OpenAI()
         self.client.api_key = api_key
+        self.model = model
 
     def run(self, prompt):
 
         completion = self.client.chat.completions.create(
-            model="gpt-4o",
+            model=self.model,
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {
