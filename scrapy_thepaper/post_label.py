@@ -56,7 +56,7 @@ for label, data in label_data.items():
             new_simple = simple.replace('userA', random.choice(replace_pronoun))
         # print(f"{simple} -> {new_simple}")
         new_data.append(new_simple)
-        label_data[label] = new_data
+    label_data[label] = new_data
 
 ## LLM生成增强
 security_prompt = f"国内外远程诈骗的手段，例如下载app、点击链接、发送短信、输入验证码、远程控制、登录支付宝或微信等涉及个人财产安全操作"
