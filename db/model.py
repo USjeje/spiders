@@ -23,6 +23,20 @@ class ThePaperSearchResults(Document):
 
     meta = {'collection': 'thepaper_search_results'}
 
+
+class VintedItem(Document):
+    id = SequenceField(primary_key=True)
+    url = StringField(required=True, unique=True)
+    title = StringField(required=True)
+    product_id = StringField()
+    brand = StringField()
+    condition = StringField()
+    price = StringField()
+    crawl_time = DateTimeField(default=datetime.datetime.now)
+    meta = {'collection': 'vinted_items'}
+
+
+
 #
 # if __name__ == '__main__':
 #     from mongoengine import connect

@@ -9,15 +9,6 @@ PORT = 27017
 connect('self_spiders', host=HOST, port=PORT)
 
 
-# class ThePaperSearchResults(Document):
-#     id = SequenceField(primary_key=True)
-#     url = StringField(required=True, unique=True)
-#     title = StringField(required=True)
-#     search_keyword = StringField(required=True)
-#     crawl_time = DateTimeField(default=datetime.datetime.now)
-#     meta = {'collection': 'thepaper_search_results'}
-
-
 class ThePaperSearchResults(Document):
     id = SequenceField(primary_key=True)
     url = StringField(required=True, unique=True)
@@ -73,17 +64,6 @@ class ThePaperSpider(scrapy.Spider):
         if not news_content:
             self.logger.warning(f"Failed to extract all information from {response.meta['url']}")
 
-        # yield {
-        #     'news_title':  response.meta['title'],
-        #     'news_description': news_description,
-        #     'news_keywords': news_keywords,
-        #     'news_content': news_content,
-        #     'news_author': news_author,
-        #     'news_source': news_source,
-        #     'news_time': news_time,
-        #     'search_keyword': response.meta['search_keyword'],
-        #     'url': response.meta['url']
-        # }
         ThePaperSearchResults.objects(url=response.meta['url']).update_one(
             set__news_description=news_description,
             set__news_keywords=news_keywords,
