@@ -10,7 +10,8 @@ class Product:
         self.max_price = max_price
 
 
-df = pd.read_excel("config.xlsx", header=0)  # 读取 Excel 文件
+df = pd.read_csv("config.csv", header=0, encoding='utf-8')  # 读取 Excel 文件
+df = df.fillna('')  # 将空值填充为空字符串，避免后续报错
 condition_list = []
 
 for index, row in df.iterrows():
@@ -25,4 +26,6 @@ for index, row in df.iterrows():
 
 # 使用示例
 # file_path = 'path_to_your_excel_file.xlsx'  # 替换为你的 Excel 文件路径
-# print(condition[0].__dict__)
+print("===================config===================")
+for condition in condition_list:
+    print(condition.__dict__)

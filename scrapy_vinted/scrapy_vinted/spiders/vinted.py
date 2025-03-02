@@ -2,10 +2,24 @@ import scrapy
 import time
 import re
 from urllib.parse import quote
+from scrapy.item import Item, Field
 from scrapy_playwright.page import PageMethod
-from ..models import VintedItem
 from ..config import condition_list
 
+
+class VintedItem(Item):
+    url = Field()
+    title = Field()
+    product_id = Field()
+    search_text = Field()
+    shipping_fee = Field()
+    price = Field()
+    is_buy = Field()
+    seller_fee = Field()
+    platform_fee = Field()
+    met_model = Field()
+    brand = Field()
+    condition = Field()
 
 class VintedSpider(scrapy.Spider):
     name = 'vinted'
@@ -37,6 +51,13 @@ class VintedSpider(scrapy.Spider):
             }
         )
 
+    @staticmethod
+    def is_have_key(product_model, possible_names) -> bool:
+        for name in possible_names:
+            if name in product_model:
+                return True
+        return False
+
     def parse(self, response):
         products = response.css('a.new-item-box__overlay')
         search_text = getattr(self, 'search_text', '').strip()
@@ -55,7 +76,7 @@ class VintedSpider(scrapy.Spider):
             is_not_need_save = True
             met_model = ''
             for condition in condition_list:
-                if product_model in condition.possible_names:
+                if self.is_have_key(product_model, condition.possible_names):
                     if platform_fee and platform_fee >= condition.min_price and platform_fee <= condition.max_price:
                         is_not_need_save = False
                         met_model = condition.model
@@ -63,56 +84,26 @@ class VintedSpider(scrapy.Spider):
             if is_not_need_save:
                 continue
 
-            item = {
-                'url': response.urljoin(product.attrib.get('href')),
-                'title': product.attrib.get('title', ''),
-                'product_id': self.extract_product_id(product),
-                'search_text': search_text,
-                'shipping_fee': None,  # 初始化为None
-                'price': None,
-                'is_buy': False,
-                'seller_fee': clean_price(prices[0]) if len(prices) > 0 else None,
-                'platform_fee': platform_fee,
-                "met_model": met_model,
-                'brand': re.search(r'brand:\s*([^,]+)', title).group(1).strip() if 'brand:' in title else None,
-                'condition': re.search(r'condition:\s*([^,]+)', title).group(
-                    1).strip() if 'condition:' in title else None
-            }
+            print("met yes")
+            # 替换原来的 `item` 定义：
+            item = VintedItem(
+                url=response.urljoin(product.attrib.get('href')),
+                title=product.attrib.get('title', ''),
+                product_id=self.extract_product_id(product),
+                search_text=search_text,
+                shipping_fee=None,
+                price=None,
+                is_buy=False,
+                seller_fee=clean_price(prices[0]) if len(prices) > 0 else None,
+                platform_fee=platform_fee,
+                met_model=met_model,
+                brand=re.search(r'brand:\s*([^,]+)', title).group(1).strip() if 'brand:' in title else None,
+                condition=re.search(r'condition:\s*([^,]+)', title).group(1).strip() if 'condition:' in title else None
+            )
 
-            # 第一阶段：快速保存基础数据
-            self.save_to_mongo(item, is_initial=True)
+            # 将 item 直接返回给 Crawlab
+            yield item
 
     def extract_product_id(self, element):
         testid = element.attrib.get('data-testid', '')
         return testid.split('--')[0].split('-')[-1] if testid else ''
-
-    def save_to_mongo(self, item, is_initial):
-        update_data = {
-            'set__title': item['title'],
-            'set__product_id': item['product_id'],
-            'set__brand': item['brand'],
-            'set__condition': item['condition'],
-            'set__search_text': item['search_text'],
-            'set__seller_fee': item['seller_fee'],
-            'set__platform_fee': item['platform_fee'],
-            'set__met_model': item['met_model'],
-            'set__is_buy': item['is_buy'],
-            'set__shipping_fee': item['shipping_fee'],
-            'set__price': item['price']
-        }
-
-        if not is_initial:  # 第二阶段更新运费和价格
-            update_data.update({
-                'set__shipping_fee': item['shipping_fee'],
-                'set__price': item['price']
-            })
-
-        try:
-            VintedItem.objects(url=item['url']).update_one(
-                **update_data,
-                upsert=True
-            )
-            log_msg = "初稿保存" if is_initial else "运费更新"
-            self.logger.info(f"✅ {log_msg}成功: {item['url']}")
-        except Exception as e:
-            self.logger.error(f"❌ 数据库操作失败: {e}")

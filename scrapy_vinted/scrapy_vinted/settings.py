@@ -29,7 +29,11 @@ PLAYWRIGHT_LAUNCH_OPTIONS = {"headless": True}  # 无头模式，后台运行
 DOWNLOADER_MIDDLEWARES = {}
 
 # 禁用不必要的管道
-ITEM_PIPELINES = {}
+# ITEM_PIPELINES = {}
+#
+# MONGODB_URI = "mongodb://localhost:27017/"
+# MONGODB_DB = "scrapy_db"
 
-MONGODB_URI = "mongodb://localhost:27017/"
-MONGODB_DB = "scrapy_db"
+ITEM_PIPELINES = {
+    'crawlab.CrawlabPipeline': 300,
+}
