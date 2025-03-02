@@ -82,59 +82,9 @@ class VintedSpider(scrapy.Spider):
             # 第一阶段：快速保存基础数据
             self.save_to_mongo(item, is_initial=True)
 
-            # 第二阶段：异步获取运费
-            # yield scrapy.Request(
-            #     url=item['url'],
-            #     callback=self.parse_shipping,
-            #     meta={
-            #         "playwright": True,
-            #         "playwright_page_methods": [
-            #             PageMethod("wait_for_selector", "h3[data-testid='item-shipping-banner-price']"),
-            #             PageMethod("wait_for_timeout", 2000)
-            #         ],
-            #         "item": item  # 传递item到详情页解析
-            #     },
-            #     priority=1  # 提高优先级以加速处理
-            # )
-
-    # def parse_shipping(self, response):
-    #     item = response.meta['item']
-    #     shipping_text = response.css(
-    #         'h3[data-testid="item-shipping-banner-price"]::text'
-    #     ).get()
-    #
-    #     # 解析运费（例如："from £5.00" -> 5.00）
-    #     shipping_fee = self.extract_shipping_fee(shipping_text)
-    #     item['shipping_fee'] = shipping_fee
-    #
-    #     # 计算最终价格（根据业务逻辑调整）
-    #     if item.get('platform_fee', 0):
-    #         item['price'] = item.get('platform_fee', 0) + shipping_fee
-    #
-    #     # 更新数据库记录
-    #     self.save_to_mongo(item, is_initial=False)
-    #     return item
-
-    # def extract_shipping_fee(self, text):
-    #     if not text:
-    #         return 0.0
-    #     match = re.search(r'€\s*([\d,]+\.\d{2})', text)
-    #     return float(match.group(1).replace(',', '')) if match else 0.0
-
     def extract_product_id(self, element):
         testid = element.attrib.get('data-testid', '')
         return testid.split('--')[0].split('-')[-1] if testid else ''
-
-    def parse_title(self, title):
-        # 欧元：r'€\s*([\d,]+\.\d{2})'
-        # 英镑：r'£([\d,]+\.\d{2})'
-        # prices = re.findall(r'€\s*([\d,]+\.\d{2})', title)
-        # clean_price = lambda s: float(s.replace(',', '')) if s else None
-
-        return {
-            'brand': re.search(r'brand:\s*([^,]+)', title).group(1).strip() if 'brand:' in title else None,
-            'condition': re.search(r'condition:\s*([^,]+)', title).group(1).strip() if 'condition:' in title else None
-        }
 
     def save_to_mongo(self, item, is_initial):
         update_data = {
@@ -146,7 +96,9 @@ class VintedSpider(scrapy.Spider):
             'set__seller_fee': item['seller_fee'],
             'set__platform_fee': item['platform_fee'],
             'set__met_model': item['met_model'],
-            'set__is_buy': item['is_buy']
+            'set__is_buy': item['is_buy'],
+            'set__shipping_fee': item['shipping_fee'],
+            'set__price': item['price']
         }
 
         if not is_initial:  # 第二阶段更新运费和价格
